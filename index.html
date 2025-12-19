@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exa Search with AI Summary</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" fill="url(#gradient1)"/>
+                    <path d="M16 8L20 16L16 24L12 16L16 8Z" fill="white"/>
+                    <defs>
+                        <linearGradient id="gradient1" x1="0" y1="0" x2="32" y2="32">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <h1>Exa Search</h1>
+            </div>
+            <div class="api-status">
+                <div class="status-indicator" id="api-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Checking...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search Section -->
+            <div class="search-section" id="search-section">
+                <div class="search-header">
+                    <h2>Search the Web</h2>
+                    <p>Powered by Exa AI + Claude</p>
+                </div>
+
+                <form class="search-form" id="search-form">
+                    <div class="search-input-wrapper">
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            class="search-input" 
+                            placeholder="Search for anything..."
+                            required
+                            autofocus
+                        />
+                        <button type="submit" class="search-btn" id="search-btn">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="2"/>
+                                <path d="M14 14L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span>Search</span>
+                        </button>
+                    </div>
+
+                    <!-- Advanced Options -->
+                    <div class="advanced-toggle">
+                        <button type="button" class="toggle-btn" id="advanced-toggle">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M2 5h12M2 8h12M2 11h12" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>Advanced Options</span>
+                            <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="advanced-options" id="advanced-options">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="num-results">Number of Results</label>
+                                <input type="number" id="num-results" value="10" min="1" max="100"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="search-type">Search Type</label>
+                                <select id="search-type">
+                                    <option value="auto">Auto</option>
+                                    <option value="neural">Neural</option>
+                                    <option value="keyword">Keyword</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="include-domains">Include Domains (comma-separated)</label>
+                                <input type="text" id="include-domains" placeholder="e.g., github.com, medium.com"/>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="exclude-domains">Exclude Domains (comma-separated)</label>
+                                <input type="text" id="exclude-domains" placeholder="e.g., pinterest.com, facebook.com"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section hidden" id="results-section">
+                <div class="results-header">
+                    <div class="results-meta">
+                        <h3>Search Results</h3>
+                        <p id="results-count"></p>
+                    </div>
+                    <button class="new-search-btn" id="new-search-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        New Search
+                    </button>
+                </div>
+
+                <!-- Summary Actions -->
+                <div class="summary-actions">
+                    <div class="selection-info">
+                        <span id="selection-count">0 results selected</span>
+                    </div>
+                    <button class="generate-summary-btn" id="generate-summary-btn" disabled>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M8 3L8 13M8 3L4 7M8 3L12 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Generate AI Summary
+                    </button>
+                </div>
+
+                <!-- Results List -->
+                <div class="results-list" id="results-list"></div>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="summary-section hidden" id="summary-section">
+                <div class="summary-header">
+                    <h3>AI-Generated Summary</h3>
+                    <button class="close-summary-btn" id="close-summary-btn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M5 5L15 15M5 15L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="summary-content">
+                    <div class="summary-text" id="summary-text"></div>
+                    
+                    <div class="key-points" id="key-points-section" style="display: none;">
+                        <h4>Key Points</h4>
+                        <ul id="key-points-list"></ul>
+                    </div>
+
+                    <div class="sources">
+                        <h4>Sources</h4>
+                        <div id="sources-list"></div>
+                    </div>
+                </div>
+
+                <div class="summary-actions-bottom">
+                    <button class="export-btn" id="export-summary-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M8 2v8M8 10l-3-3M8 10l3-3M3 14h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        Export Summary
+                    </button>
+                    <button class="copy-btn" id="copy-summary-btn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <rect x="5" y="5" width="8" height="8" stroke="currentColor" stroke-width="2"/>
+                            <path d="M3 11V3h8" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Copy to Clipboard
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading hidden" id="loading">
+                <div class="spinner"></div>
+                <p id="loading-text">Searching...</p>
+            </div>
+
+            <!-- Error State -->
+            <div class="error-message hidden" id="error-message">
+                <div class="error-icon">⚠️</div>
+                <p id="error-text"></p>
+                <button class="retry-btn" id="retry-btn">Try Again</button>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by <a href="https://exa.ai" target="_blank">Exa AI</a> + <a href="https://anthropic.com" target="_blank">Claude</a></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
