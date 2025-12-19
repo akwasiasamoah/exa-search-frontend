@@ -192,6 +192,10 @@ function createResultCard(result, index) {
 
   const content = document.createElement("div");
   content.className = "result-content";
+
+  // Check if it's LinkedIn
+  const isLinkedIn = result.url.toLowerCase().includes("linkedin.com");
+
   content.innerHTML = `
         <div class="result-header">
             <h4 class="result-title">${escapeHtml(
@@ -208,6 +212,11 @@ function createResultCard(result, index) {
         <a href="${result.url}" target="_blank" class="result-url">${escapeHtml(
     result.url
   )}</a>
+        ${
+          isLinkedIn
+            ? '<div class="warning-badge">⚠️ LinkedIn - May not work (bot protection)</div>'
+            : ""
+        }
         <div class="result-meta">
             ${
               result.author
@@ -247,9 +256,14 @@ function updateSelectionUI() {
 
 // Handle Generate Summary
 async function handleGenerateSummary() {
-  const selectedUrls = Array.from(selectedResults).map(
-    (index) => searchResults[index].url
-  );
+  // Get selected results with both URLs and IDs
+  const selectedData = Array.from(selectedResults).map((index) => ({
+    url: searchResults[index].url,
+    id: searchResults[index].id, // Include Exa result ID
+  }));
+
+  const selectedUrls = selectedData.map((item) => item.url);
+  const selectedIds = selectedData.map((item) => item.id);
   const query = searchInput.value.trim();
 
   if (selectedUrls.length === 0 || selectedUrls.length > 5) {
@@ -266,6 +280,7 @@ async function handleGenerateSummary() {
       },
       body: JSON.stringify({
         urls: selectedUrls,
+        ids: selectedIds, // Include IDs for Exa API
         query: query,
       }),
     });
